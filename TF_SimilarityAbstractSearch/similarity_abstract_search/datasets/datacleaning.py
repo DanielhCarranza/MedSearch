@@ -31,12 +31,12 @@ class TextDataCleaning:
     return df
 
 
-  # def embProcessing(self, df):
-  #   df['citeEmbeddingsID']=df.totalCitation.map(lambda row: [self.paperID2EmbeddingID[i] 
-  #                                     for i in row if self.paperID2EmbeddingID.get(i)])
-  #   df['EmbeddingID'] = df['id'].map(self.paperID2EmbeddingID) 
-  #   df = df.loc[:,['EmbeddingID', 'paperAbstract', 'title', 'citeEmbeddingsID']]
-  #   return df
+  def embProcessing(self, df):
+    df['citeEmbeddingsID']=df.totalCitation.map(lambda row: [self.paperID2EmbeddingID[i] 
+                                      for i in row if self.paperID2EmbeddingID.get(i)])
+    df['EmbeddingID'] = df['id'].map(self.paperID2EmbeddingID) 
+    df = df.loc[:,['EmbeddingID', 'paperAbstract', 'title', 'citeEmbeddingsID']]
+    return df
   
 
   @staticmethod
@@ -60,7 +60,7 @@ class TextDataCleaning:
       df = self.remove_nonenglish(df)
       paper_set.update(set(df.id.values))
       df.to_json(data_path/f'pruned{fn.stem[-3:]}.json.gzip', compression='gzip')
-      # os.remove(str(fn))
+      os.remove(str(fn))
 
     self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
     save_dict2json(str(data_path.parent/'paperID2emb' ), self.paperID2EmbeddingID)
@@ -79,7 +79,7 @@ def main():
   INNER_PATH = Path(__file__).resolve().parents[3]/'Data/processed/SemanticScholarData'
   PAPER_SET  = INNER_PATH.parent/'paper_set.txt'
   data_files = INNER_PATH.ls()
-  data_cleaning = TextDataCleaning(data_files[:2], PAPER_SET)
+  data_cleaning = TextDataCleaning(data_files, PAPER_SET)
   data_cleaning.pruning_and_cleaning(INNER_PATH)
 
 

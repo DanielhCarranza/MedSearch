@@ -1,9 +1,9 @@
 #!/bin/bash
 
 DATA_PATH='Data/processed/SemanticScholarData/'
-# mkdir $DATA_PATH 
-# rm Data/processed/paper_set.txt
-# wget https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/2020-05-27/manifest.txt -P 'Data/processed/'  
+mkdir $DATA_PATH 
+rm Data/processed/paper_set.txt
+wget https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/2020-05-27/manifest.txt -P 'Data/processed/'  
 
 src='https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/2020-04-10/'
 file_names=$(grep s2-corpus Data/processed/manifest.txt)
