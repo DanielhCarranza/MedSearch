@@ -86,9 +86,9 @@ def main():
   INNER_PATH = Path(__file__).resolve().parents[3]/'Data/processed/SemanticScholarData'
   PAPER_SET  = INNER_PATH.parent/'paper_set.txt'
   data_files = INNER_PATH.ls()
-  data_cleaning = TextDataCleaning(INNER_PATH, data_files)
-  # data_cleaning.pruning_and_cleaning()
-  data_cleaning.concat_files()
+  data_cleaning = TextDataCleaning(INNER_PATH, data_files, PAPER_SET)
+  data_cleaning.pruning_and_cleaning()
+  # data_cleaning.concat_files()
 
 
 if __name__ == "__main__":
