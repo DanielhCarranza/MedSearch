@@ -10,8 +10,8 @@ from similarity_abstract_search.utils import get_paper_set, get_raw_json_data, s
 Path.ls = lambda x: list(x.iterdir())
 
 class TextDataCleaning:
-  def __init__(self, data_files:list, paper_set_file=None):
-    self.data_files = data_files
+  def __init__(self, data_path, data_files:list, paper_set_file=None):
+    self.data_files, self.data_path = data_files, data_path
     if paper_set_file is not None:
       self.paper_set = get_paper_set(paper_set_file)
     identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
@@ -26,6 +26,7 @@ class TextDataCleaning:
     vSet = journalSet|set(df['venue'])
     engJournals=[i for i in jSet if str(self.lang(i)).find('en') != -1 and self.lang(i)[1]>0.5]  
     engVenues = [i for i in vSet if str(self.lang(i)).find('en') != -1 and self.lang(i)[1]>0.5]  
+    # use .loc to save the copy of the slicing 
     df = df[df['journalName'].isin(engJournals) | df['venue'].isin(engVenues)]
     df.drop(['journalName','venue'], axis=1, inplace=True)
     return df
@@ -35,7 +36,7 @@ class TextDataCleaning:
     df['citeEmbeddingsID']=df.totalCitation.map(lambda row: [self.paperID2EmbeddingID[i] 
                                       for i in row if self.paperID2EmbeddingID.get(i)])
     df['EmbeddingID'] = df['id'].map(self.paperID2EmbeddingID) 
-    df = df.loc[:,['EmbeddingID', 'paperAbstract', 'title', 'citeEmbeddingsID']]
+    df = df.loc[:,['id','EmbeddingID', 'paperAbstract', 'title', 'citeEmbeddingsID']]
     return df
   
 
@@ -51,7 +52,7 @@ class TextDataCleaning:
     h5f.close()
   
 
-  def pruning_and_cleaning(self, data_path):
+  def pruning_and_cleaning(self):
     paper_set = set()
     for fn in self.data_files:
       df = get_raw_json_data(fn)
@@ -59,28 +60,35 @@ class TextDataCleaning:
       df = self.pruning(df)
       df = self.remove_nonenglish(df)
       paper_set.update(set(df.id.values))
-      df.to_json(data_path/f'pruned{fn.stem[-3:]}.json.gzip', compression='gzip')
+      df.to_json(self.data_path/f'pruned{fn.stem[-3:]}.json.gzip', compression='gzip')
       os.remove(str(fn))
 
     self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
-    save_dict2json(str(data_path.parent/'paperID2emb' ), self.paperID2EmbeddingID)
-  
-    # df = pd.concat([pd.read_json(data_path/'pruned{fn.stem[-3:]}.json.gzip', compression='gzip') 
-    #                 for fn in self.data_files])
-    # df.to_json(data_path/'pruned_and_clean.json.gzip', compression='gzip')
+    save_dict2json(str(self.data_path.parent/'paperID2emb' ), self.paperID2EmbeddingID)
 
-  def concat_files(self, data_path):
-    df = pd.concat([pd.read_json(data_path/'pruned{fn.stem[-3:]}.json.gzip', compression='gzip') 
+    self.data_files  = self.data_path.ls() 
+    df = pd.concat([pd.read_json(fn, compression='gzip') 
                     for fn in self.data_files])
-    df.to_json(data_path/'pruned_and_clean.json.gzip', compression='gzip')
-    
+    df  = self.embProcessing(df)
+    df.to_json(self.data_path/'pruned_and_clean.json.gzip', compression='gzip')
+
+  def concat_files(self):
+    df = pd.concat([pd.read_json(fn, compression='gzip') 
+                    for fn in self.data_files])
+    paper_set = set(df.id.values)
+    self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
+    df  = self.embProcessing(df)
+    df.to_json(self.data_path/'pruned_and_clean.json.gzip', compression='gzip')
+
+  
 
 def main():
   INNER_PATH = Path(__file__).resolve().parents[3]/'Data/processed/SemanticScholarData'
   PAPER_SET  = INNER_PATH.parent/'paper_set.txt'
   data_files = INNER_PATH.ls()
-  data_cleaning = TextDataCleaning(data_files, PAPER_SET)
-  data_cleaning.pruning_and_cleaning(INNER_PATH)
+  data_cleaning = TextDataCleaning(INNER_PATH, data_files)
+  # data_cleaning.pruning_and_cleaning()
+  data_cleaning.concat_files()
 
 
 if __name__ == "__main__":
