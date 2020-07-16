@@ -1,0 +1,12 @@
+boltons
+editdistance
+flask
+h5py
+numpy
+opencv-python-headless
+requests
+tensorflow==2.3.0-rc0
+toml
+tqdm
+langid
+wrapt==1.11.* # due to pylint
