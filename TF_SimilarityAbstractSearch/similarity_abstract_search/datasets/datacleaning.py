@@ -5,7 +5,7 @@ import numpy as np
 import h5py
 from pathlib import Path 
 from langid.langid import LanguageIdentifier, model
-from similarity_abstract_search.utils import get_paper_set, get_raw_json_data, save_dict2json
+from similarity_abstract_search.utils import get_paper_set, get_raw_json_data, save_dict2json, load_json
 
 Path.ls = lambda x: list(x.iterdir())
 
@@ -63,16 +63,13 @@ class TextDataCleaning:
       df.to_json(self.data_path/f'pruned{fn.stem[-3:]}.json.gz', compression='gzip')
       os.remove(str(fn))
 
-    self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
-    pd.DataFrame(self.paperID2EmbeddingID).to_json(str(self.data_path.parent/'paper_IDemb.json'))
+    # self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
     # save_dict2json(str(self.data_path.parent/'paperID2emb' ), self.paperID2EmbeddingID)
 
-    # self.data_files  = self.data_path.ls() 
-    
-  def concat_files(self):
+  def concat_files(self, paperID2EmbeddingID):
     df = pd.concat([pd.read_json(fn, compression='gzip', lines=True, chunksize=100) 
                     for fn in self.data_files])
-    paper_set = set(df.id.values)
+    paper_set = load_json(paperID2EmbeddingID) 
     self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
     df  = self.embProcessing(df)
     df.to_json(self.data_path/'pruned_and_clean.json.gz', compression='gzip')
@@ -81,12 +78,12 @@ class TextDataCleaning:
 
 def main():
   INNER_PATH = Path(__file__).resolve().parents[3]/'Data/processed/SemanticScholarData'
-  # PAPER_SET  = INNER_PATH.parent/'paper_set.txt'
+  PAPER_SET  = INNER_PATH.parent/'paper_set.txt'
   data_files = INNER_PATH.ls()
   data_cleaning = TextDataCleaning(INNER_PATH, data_files)
   import ipdb; ipdb.set_trace()
-  # data_cleaning.pruning_and_cleaning()
-  data_cleaning.concat_files()
+  data_cleaning.pruning_and_cleaning()
+  data_cleaning.concat_files('paperID2emb.json')
 
 
 if __name__ == "__main__":

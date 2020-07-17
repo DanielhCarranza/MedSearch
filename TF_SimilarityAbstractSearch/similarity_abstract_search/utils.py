@@ -5,6 +5,7 @@ import json
 import hashlib
 import numpy as np
 import pandas as pd 
+import pickle
 from tqdm import tqdm
 from concurrent.futures import as_completed, ThreadPoolExecutor
 from pathlib import Path
@@ -38,3 +39,12 @@ def get_paper_set(file: Union[Path, str])->set:
 def save_dict2json(filename, dictObj):
   with open(f'{filename}.json', 'w') as outfile:
     json.dump(dictObj, outfile)
+
+def load_json(filename):
+  with open(filename,'r') as f:
+    data = json.load(f)
+  return data
+
+def savePaperID(obj, filename):
+  with open(f'{filename}.txt', 'w') as outfile:
+    pickle.dump(obj, outfile)
