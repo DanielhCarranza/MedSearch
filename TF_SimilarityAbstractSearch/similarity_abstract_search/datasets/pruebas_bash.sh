@@ -13,6 +13,6 @@ for fn in $array; do
     wget -qO- $src$fn | gunzip -c - > 'Data/processed/corpus.json'  
     cat Data/processed/corpus.json | \
     jq 'select(.fieldsOfStudy== ["Biology"] or ["Medicine"]) | select(.pmid !="" or .sources=="Medline") | {id:.id,  paperAbstract: .paperAbstract, title:.title, journalName:.journalName, venue:.venue, totalCitation:(.outCitations + .inCitations)} | select(.totalCitation !=[]) |  @json' > $DATA_PATH$jsonfn
-    jq ' fromjson | .id ' $DATA_PATH$jsonfn >> Data/processed/paper_set.txt
+    #jq ' fromjson | .id ' $DATA_PATH$jsonfn >> Data/processed/paper_set.txt
     rm Data/processed/corpus.json
 done
