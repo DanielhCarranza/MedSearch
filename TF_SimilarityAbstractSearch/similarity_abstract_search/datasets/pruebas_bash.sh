@@ -2,11 +2,11 @@
 
 DATA_PATH='Data/processed/SemanticScholarData/'
 # mkdir $DATA_PATH 
-# wget https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/2020-05-27/manifest.txt -P 'Data/processed/'  
+wget https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/2020-05-27/manifest.txt -P 'Data/processed/'  
 
 src='https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/2020-04-10/'
 file_names=($(grep s2-corpus Data/processed/manifest.txt))
-array=$(echo ${file_names[@]:58:60}) 
+array=$(echo ${file_names[@]:110:184}) 
 for fn in $array; do
     jsonfn=$(echo $fn | cut -d'.' -f 1)'.json'
     echo $src$fn
