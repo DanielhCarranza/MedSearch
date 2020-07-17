@@ -77,10 +77,9 @@ class TextDataCleaning:
   
   def concat_filesV2(self, paperID2EmbeddingID):
     data = []
-    paper_set = load_json(paperID2EmbeddingID) 
-    self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
+    self.paperID2EmbeddingID = load_json(paperID2EmbeddingID) 
     for fn in self.data_files:
-        df = pd.read_json(fn, compression='gzip', lines=True, chunksize=100) 
+        df = pd.read_json(fn, compression='gzip') 
         df  = self.embProcessing(df)
         data.append(df)
     df = pd.concat(data)
@@ -93,9 +92,8 @@ def main():
   PAPER_SET  = INNER_PATH.parent/'paper_set.txt'
   data_files = INNER_PATH.ls()
   data_cleaning = TextDataCleaning(INNER_PATH, data_files, PAPER_SET)
-  import ipdb; ipdb.set_trace()
   data_cleaning.pruning_and_cleaning()
-  data_cleaning.concat_files('paperID2emb.json')
+  data_cleaning.concat_filesV2(str(INNER_PATH.parent/'paperID2emb.json'))
 
 
 if __name__ == "__main__":
