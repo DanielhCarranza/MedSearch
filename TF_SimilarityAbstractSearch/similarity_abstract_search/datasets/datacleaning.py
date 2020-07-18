@@ -51,52 +51,36 @@ class TextDataCleaning:
     h5f.create_dataset('paper', data=embIDs.values[:,0].astype(np.int32), compression='gzip', compression_opts=9, chunks=True, maxshape=(None,) )
     h5f.close()
   
-
-  def pruning_and_cleaning(self):
-    # paper_set = set()
+  def cleanEmbeddings(self): 
+    for i, fn in enumerate(self.data_files):
+        print(f'Embedding Cleaning {i} {fn}')
+        df = pd.read_json(fn, compression='gzip') 
+        df  = self.embProcessing(df)
+        df.to_json(self.data_path/f'pruned_and_clean{i:003}.json.gz', compression='gzip')
+        os.remove(fn)
+  
+  def dataCleaning(self, save_paper_id=False):
+    paper_set = set()
     for fn in self.data_files:
       df = get_raw_json_data(fn)
       print(fn)
       df = self.pruning(df)
       df = self.remove_nonenglish(df)
-      # paper_set.update(set(df.id.values))
+      paper_set.update(set(df.id.values))
       df.to_json(self.data_path/f'pruned{fn.stem[-3:]}.json.gz', compression='gzip')
       os.remove(str(fn))
-
-    #self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
-    #save_dict2json(str(self.data_path.parent/'paperID2emb' ), self.paperID2EmbeddingID)
-
-  def concat_files(self, paperID2EmbeddingID):
-    df = pd.concat([pd.read_json(fn, compression='gzip', lines=True, chunksize=100) 
-                    for fn in self.data_files])
-    paper_set = load_json(paperID2EmbeddingID) 
     self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
-    df  = self.embProcessing(df)
-    df.to_json(self.data_path/'pruned_and_clean.json.gz', compression='gzip')
-
-  
-  def concat_filesV2(self, paperID2EmbeddingID):
-    data = []
-    self.paperID2EmbeddingID = load_json(paperID2EmbeddingID) 
-    for fn in self.data_files:
-        print(f'CONCAT {fn}')
-        df = pd.read_json(fn, compression='gzip') 
-        df  = self.embProcessing(df)
-        data.append(df)
-    df = pd.concat(data)
-    df.to_json(self.data_path/'pruned_and_clean.json.gz', compression='gzip')
-
-  
+    self.data_files = self.data_path.ls()
+    self.cleanEmbeddings()
+    if save_paper_id:
+      save_dict2json(str(self.data_path.parent/'paperID2emb' ), self.paperID2EmbeddingID)
 
 def main():
   INNER_PATH = Path(__file__).resolve().parents[3]/'Data/processed/SemanticScholarData'
-  # PAPER_SET  = INNER_PATH.parent/'paper_set.txt'
+  PAPER_SET  = INNER_PATH.parent/'paper_set.txt'
   data_files = INNER_PATH.ls()
-  # data_files = [fn for fn in data_files if fn.suffix=='.json']
-  # import ipdb; ipdb.set_trace()
-  data_cleaning = TextDataCleaning(INNER_PATH, data_files )
-  # data_cleaning.pruning_and_cleaning()
-  data_cleaning.concat_filesV2(str(INNER_PATH.parent/'paperID2emb.json'))
+  data_cleaning = TextDataCleaning(INNER_PATH, data_files, PAPER_SET)
+  data_cleaning.dataCleaning()
 
   
 if __name__ == "__main__":
