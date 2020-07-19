@@ -31,24 +31,27 @@ class TextDataCleaning:
     return df
 
 
-  def embProcessing(self, df, embed_filename):
+  def embProcessing(self, df):
     df['citeEmbeddingsID']=df.totalCitation.map(lambda row: [self.paperID2EmbeddingID[i] 
                                       for i in row if self.paperID2EmbeddingID.get(i)])
     df['EmbeddingID'] = df['id'].map(self.paperID2EmbeddingID) 
     df = df.loc[:,['id','EmbeddingID', 'paperAbstract', 'title', 'citeEmbeddingsID']]
     embIDs = df.loc[:,['EmbeddingID', 'citeEmbeddingsID']]
     embIDs['citeEmbeddingsID'] = embIDs['citeEmbeddingsID'].apply(lambda x: np.array(x)) 
-    utils.saveEmbedIDs(embIDs.values[:,1], embIDs.values[:,0].astype(np.int32), embed_filename) 
-    return df
+    return df, embIDs
   
   
   def cleanEmbeddings(self): 
+    embed_list=[]
     for i, fn in enumerate(self.data_files):
         print(f'Embedding Cleaning {i} {fn}')
         df = pd.read_json(fn, compression='gzip') 
-        df  = self.embProcessing(df, (self.data_path/'EmbedIDs')/f'embIDs{i:003}')
+        df, embIDs= self.embProcessing(df) 
         df.to_json(self.data_path/f'pruned_and_clean{i:003}.json.gz', compression='gzip')
+        embed_list.append(embIDs)
         os.remove(fn)
+    embIDs = pd.concat(embed_list)
+    utils.saveEmbedIDs(embIDs.values[:,1], embIDs.values[:,0].astype(np.int32), self.data_path.parent/'embedIDs') 
   
   def dataCleaning(self, save_paper_id=False):
     paper_set = set()
@@ -61,10 +64,10 @@ class TextDataCleaning:
       df.to_json(self.data_path/f'pruned{fn.stem[-3:]}.json.gz', compression='gzip')
       os.remove(str(fn))
     self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
+    if save_paper_id:
+      utils.save_dict2json(self.data_path.parent/'paperID2emb', self.paperID2EmbeddingID)
     self.data_files = self.data_path.ls()
     self.cleanEmbeddings()
-    if save_paper_id:
-      utils.save_dict2json(str(self.data_path.parent/'paperID2emb' ), self.paperID2EmbeddingID)
 
 def main():
   INNER_PATH = Path(__file__).resolve().parents[3]/'Data/processed/SemanticScholarData'
