@@ -5,7 +5,7 @@ import json
 import hashlib
 import numpy as np
 import pandas as pd 
-import pickle
+import h5py
 from tqdm import tqdm
 from concurrent.futures import as_completed, ThreadPoolExecutor
 from pathlib import Path
@@ -45,6 +45,9 @@ def load_json(filename):
     data = json.load(f)
   return data
 
-def savePaperID(obj, filename):
-  with open(f'{filename}.txt', 'w') as outfile:
-    pickle.dump(obj, outfile)
+def saveEmbedIDs(citesIDs:np.array, paperIDs:np.array, filename:str):
+  h5f = h5py.File(f'{filename}.h5', 'w')
+  dt = h5py.special_dtype(vlen=np.dtype('int32'))
+  h5f.create_dataset('cites', data=citesIDs, dtype=dt, compression='gzip', compression_opts=9, chunks=True, maxshape=(None,) )
+  h5f.create_dataset('paper', data=paperIDs, compression='gzip', compression_opts=9, chunks=True, maxshape=(None,) )
+  h5f.close()

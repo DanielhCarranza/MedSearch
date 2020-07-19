@@ -5,15 +5,14 @@ import numpy as np
 import h5py
 from pathlib import Path 
 from langid.langid import LanguageIdentifier, model
-from similarity_abstract_search.utils import get_paper_set, get_raw_json_data, save_dict2json, load_json
-
+from similarity_abstract_search import utils
 Path.ls = lambda x: list(x.iterdir())
 
 class TextDataCleaning:
   def __init__(self, data_path, data_files:list, paper_set_file=None):
     self.data_files, self.data_path = data_files, data_path
     if paper_set_file is not None:
-      self.paper_set = get_paper_set(paper_set_file)
+      self.paper_set = utils.get_paper_set(paper_set_file)
     identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
     self.lang = lambda s : identifier.classify(str(s)) 
 
@@ -32,37 +31,29 @@ class TextDataCleaning:
     return df
 
 
-  def embProcessing(self, df):
+  def embProcessing(self, df, embed_filename):
     df['citeEmbeddingsID']=df.totalCitation.map(lambda row: [self.paperID2EmbeddingID[i] 
                                       for i in row if self.paperID2EmbeddingID.get(i)])
     df['EmbeddingID'] = df['id'].map(self.paperID2EmbeddingID) 
     df = df.loc[:,['id','EmbeddingID', 'paperAbstract', 'title', 'citeEmbeddingsID']]
-    return df
-  
-
-  @staticmethod
-  def saveEmbedIDs(df, filename):
     embIDs = df.loc[:,['EmbeddingID', 'citeEmbeddingsID']]
     embIDs['citeEmbeddingsID'] = embIDs['citeEmbeddingsID'].apply(lambda x: np.array(x)) 
-    
-    h5f = h5py.File(f'{filename}.h5', 'w')
-    dt = h5py.special_dtype(vlen=np.dtype('int32'))
-    h5f.create_dataset('cites', data=embIDs.values[:,1], dtype=dt, compression='gzip', compression_opts=9, chunks=True, maxshape=(None,) )
-    h5f.create_dataset('paper', data=embIDs.values[:,0].astype(np.int32), compression='gzip', compression_opts=9, chunks=True, maxshape=(None,) )
-    h5f.close()
+    utils.saveEmbedIDs(embIDs.values[:,1], embIDs.values[:,0].astype(np.int32), embed_filename) 
+    return df
+  
   
   def cleanEmbeddings(self): 
     for i, fn in enumerate(self.data_files):
         print(f'Embedding Cleaning {i} {fn}')
         df = pd.read_json(fn, compression='gzip') 
-        df  = self.embProcessing(df)
+        df  = self.embProcessing(df, (self.data_path/'EmbedIDs')/f'embIDs{i:003}')
         df.to_json(self.data_path/f'pruned_and_clean{i:003}.json.gz', compression='gzip')
         os.remove(fn)
   
   def dataCleaning(self, save_paper_id=False):
     paper_set = set()
     for fn in self.data_files:
-      df = get_raw_json_data(fn)
+      df = utils.get_raw_json_data(fn)
       print(fn)
       df = self.pruning(df)
       df = self.remove_nonenglish(df)
@@ -73,7 +64,7 @@ class TextDataCleaning:
     self.data_files = self.data_path.ls()
     self.cleanEmbeddings()
     if save_paper_id:
-      save_dict2json(str(self.data_path.parent/'paperID2emb' ), self.paperID2EmbeddingID)
+      utils.save_dict2json(str(self.data_path.parent/'paperID2emb' ), self.paperID2EmbeddingID)
 
 def main():
   INNER_PATH = Path(__file__).resolve().parents[3]/'Data/processed/SemanticScholarData'
