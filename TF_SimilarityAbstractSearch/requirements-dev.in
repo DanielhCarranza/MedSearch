@@ -3,7 +3,7 @@ bandit
 black
 gpustat
 gradescope-utils
-grequests # admin
+grequests 
 itermplot
 matplotlib
 mypy
@@ -19,3 +19,7 @@ safety
 scipy
 pillow
 wandb
+transformers
+nlp
+tokenizers==0.8.1.rc1
+sentence-transformers

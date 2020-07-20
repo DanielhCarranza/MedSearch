@@ -51,3 +51,7 @@ def saveEmbedIDs(citesIDs:np.array, paperIDs:np.array, filename:str):
   h5f.create_dataset('cites', data=citesIDs, dtype=dt, compression='gzip', compression_opts=9, chunks=True, maxshape=(None,) )
   h5f.create_dataset('paper', data=paperIDs, compression='gzip', compression_opts=9, chunks=True, maxshape=(None,) )
   h5f.close()
+
+def loadH5file(filename):
+  h5file = h5py.File(f'{filename}.h5','r')
+  return h5file
