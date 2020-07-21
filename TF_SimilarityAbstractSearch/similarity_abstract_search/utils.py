@@ -36,7 +36,7 @@ def get_paper_set(file: Union[Path, str])->set:
   else: print('File not in the correct format')
   return ps
 
-def save_dict2json(filename, dictObj):
+def save_to_json(filename, dictObj):
   with open(f'{filename}.json', 'w') as outfile:
     json.dump(dictObj, outfile)
 

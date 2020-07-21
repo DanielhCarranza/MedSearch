@@ -23,7 +23,8 @@ class SemanticCorpusDataset(BaseDataset):
 
     def load_one_batch(self):
         # Use generators
-        self.data = pd.read_json(self.data_files[0]).set_index('EmbeddingID')
+        data = pd.read_json(self.data_files[0]).set_index('EmbeddingID')
+        self.data= data.loc[data.paperAbstract!=""]
         return self[0]
 
     def __getitem__(self,idx):
