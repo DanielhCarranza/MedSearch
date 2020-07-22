@@ -41,7 +41,7 @@ def save_to_json(filename, dictObj):
     json.dump(dictObj, outfile)
 
 def load_json(filename):
-  with open(filename,'r') as f:
+  with open(f"{ filename }",'r') as f:
     data = json.load(f)
   return data
 

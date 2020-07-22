@@ -3,6 +3,7 @@ from tqdm import tqdm
 from typing import Union, List, Tuple, Callable, Dict, Optional
 from sklearn import svm
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from similarity_abstract_search.models.base import ModelBase
 from similarity_abstract_search.datasets.dataset import SemanticCorpusDataset
 
@@ -44,7 +45,56 @@ class TfidfModel(ModelBase):
             ix = np.argsort(simVec)[:-nTake-1:-1]
             IX[i]=ix
         return IX.tolist()
-    
 
+
+    def build_search_index(self,data, v):
+
+        # construct a reverse index for suppoorting search
+        vocab = v.vocabulary_
+        idf = v.idf_
+        punc = "'!\"#$%&\'()*+,./:;<=>?@[\\]^_`{|}~'" # removed hyphen from string.punctuation
+        trans_table = {ord(c): None for c in punc}
+
+        def makedict(s, forceidf=None):
+            words = set(s.lower().translate(trans_table).strip().split())
+            words = set(w for w in words if len(w) > 1 and (not w in ENGLISH_STOP_WORDS))
+            idfd = {}
+            for w in words: # todo: if we're using bigrams in vocab then this won't search over them
+                if forceidf is None:
+                    if w in vocab:
+                        idfval = idf[vocab[w]] # we have a computed idf for this
+                    else:
+                        idfval = 2.0 # some word we don't know; assume idf 1.0 (low)
+                else:
+                    idfval = forceidf
+                idfd[w] = idfval
+            return idfd
+
+        def merge_dicts(dlist):
+            m = {}
+            for d in dlist:
+                for k, v in d.items():
+                    m[k] = m.get(k,1) + v
+            return m
+
+        dict_title = data.title.apply(lambda s: makedict(s, forceidf=11))
+        dict_summary = data['paperAbstract'].apply(makedict)#.to_dict()
+        search_dict = [merge_dicts([t,s]) for t,s in zip(dict_title, dict_summary)]
+        return search_dict
+
+def modelExampleTest(save_dicts:bool=True):
+    model = TfidfModel(dataset_args={"batch":5000})
+    df = model.data.load_one_batch()
+    corpus = [f'{t} <SEP> {a}' for t,a in zip(df.title, df.paperAbstract)]
+    X,V = model.fit(corpus)
+    IX = model.svmSimilarity(X)
+    search = model.build_search_index(df, V)
+    if save_dicts:
+        model.save_weights(search, model.data.data_dirname().parent/'search')
+        model.save_weights(IX, model.data.data_dirname().parent/'sim_vecs')
+
+if __name__ == "__main__":
+    modelExampleTest()
+    
 
 

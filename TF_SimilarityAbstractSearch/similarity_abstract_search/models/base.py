@@ -22,5 +22,5 @@ class ModelBase:
         pass
 
     def save_weights(self, obj, filename):
-        with open(f'{filename}', 'w') as outfile:
+        with open(f'{filename}.json', 'w') as outfile:
             json.dump(obj, outfile)
