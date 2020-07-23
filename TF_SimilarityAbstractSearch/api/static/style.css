@@ -177,7 +177,7 @@ h1 {
 
     padding-left: 50px;
 
-    background-image:url('/styles/search.png');
+    background-image:url('/static/search.png');
     background-repeat:no-repeat;
     background-position:left center;
     outline:0;
