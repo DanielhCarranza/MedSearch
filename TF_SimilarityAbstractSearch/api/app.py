@@ -56,7 +56,7 @@ def main():
     papers = paper_dict[:40]
     context = default_contex(papers, sort_order='latest')
     return render_template('index.html', **context)
-    # app.run(host="0.0.0.0", port=5000, debug=False)
+    # app.run(host="0.0.0.0", port=5000, debug=True)
 
 if __name__ == "__main__":
     main()

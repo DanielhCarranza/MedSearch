@@ -51,10 +51,7 @@ h1 {
     text-decoration: none;
 }
 
-.rel_authors {
-    font-weight: 300;
-    font-size: 14px;
-}
+
 
 .dllinks {
     border-radius: 5px;
@@ -72,23 +69,13 @@ h1 {
     text-decoration: underline;
 }
 
-.rel_date {
-    color: #900;
-}
 
-.rel_title {
+
+.title {
     font-size: 18px;
 }
 
-.medrxiv .rel_title a {
-    color: #0e4c92;
-}
-
-.biorxiv .rel_title a {
-    color: #bc2635;
-}
-
-.rel_abs {
+.paperAbstract {
     font-family: Arial, Helvetica, sans-serif;
     font-weight: 300;
     background-color: #EFE;

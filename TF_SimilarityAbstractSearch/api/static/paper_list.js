@@ -43,11 +43,11 @@ const Paper = props => {
       <div class='dllinks'>
         <div class='metadata action'><a href={'/sim/' + p.rel_doi}>show similar</a></div>
         <div class='metadata action'><a href={url}>pdf</a></div>
-        <div class='metadata rel_date'>{p.rel_date}</div>
+        {/* <div class='metadata rel_date'>{p.rel_date}</div> */}
       </div>
-      <div class='rel_title'><a href={p.rel_link}>{p.rel_title}</a></div>
-      <div class='rel_authors'>{p.rel_authors}</div>
-      <div class='rel_abs'>{p.rel_abs}</div>
+      <div class='title'><a href={p.id}>{p.title}</a></div>
+      <div class='EmbeddingID'>{p.EmbeddingID}</div>
+      <div class='paperAbstract'>{p.paperAbstract}</div>
       <Tweets tweets={p.tweets} />
     </div>
   )
