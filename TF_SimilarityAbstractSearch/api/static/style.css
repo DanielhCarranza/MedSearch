@@ -3,20 +3,31 @@ body {
     padding: 0;
     font-family: "Gill Sans", "Gill Sans MT", Helvetica, Arial, sans-serif;
     font-weight: 400;
-    background-color: #F6F3E5;
+    background-color: lightgray;
 }
 
 #titdiv {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+/* #titdiv {
 	height: 50px;
-	background-color: blue;
+	background-color: #282c34;
 	color: white;
 	padding-top: 10px;
     padding-left: 20px;
     padding-bottom: 30px;
 	border-bottom: 1px solid #540000;
-}
+} */
 h1 {
-    font-size: 24px;
+    font-size: 40px;
     padding: 0;
     margin: 0;
     font-weight: 400;
@@ -25,10 +36,10 @@ h1 {
     font-weight: 300;
 }
 #titdiv a:visited {
-    color: white;
+    color: darkcyan;
 }
 #titdiv a:link {
-    color: white;
+    color: darkcyan;
 }
 
 #wrap {
@@ -44,6 +55,7 @@ h1 {
     font-size: 16px;
     border: 1px solid #333;
     background-color: white;
+    border-radius: 0.5rem;
 }
 
 .rel_paper a {
@@ -73,12 +85,13 @@ h1 {
 
 .title {
     font-size: 18px;
+    color: darkblue;
 }
 
 .paperAbstract {
     font-family: Arial, Helvetica, sans-serif;
     font-weight: 300;
-    background-color: #EFE;
+    background-color: lightcyan;
     padding: 10px;
     margin-top: 10px;
     border-radius: 5px 5px 0px 0px;
@@ -87,11 +100,12 @@ h1 {
 
 #info {
     background-color: #EEF;
-    padding: 10px;
+    padding: 5px;
     margin: 10px;
     border: 1px solid #CCD;
     color: #005;
     font-weight: 300;
+    font-size: 10px;
 }
 
 #sbox {
@@ -103,13 +117,11 @@ h1 {
     border: 5px solid white;
     width: 920px;
     border: solid 1px #999;
-
+    border-radius: 0.5rem;
     height: 40px;
     font-size: 22px;
     color: "#333";
-
     padding-left: 50px;
-
     background-image:url('/static/search.png');
     background-repeat:no-repeat;
     background-position:left center;

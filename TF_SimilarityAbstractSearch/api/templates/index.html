@@ -14,21 +14,21 @@
 <body>
     <div id="titdiv">
         <h1>TalkToMedPapers</h1> 
+        <!-- search box -->
+        <div id="sbox">
+            <form action="/search" method="get">
+                <input name="q" type="text" id="qfield" value="{{ gvars.search_query }}">
+            </form>
+        </div>
+        
+        <div id="wrap">
+        </div>
 
     </div>
 
 
-<!-- search box -->
-<div id="sbox">
-    <form action="/search" method="get">
-        <input name="q" type="text" id="qfield" value="{{ gvars.search_query }}">
-    </form>
-</div>
 
 
-
-<div id="wrap">
-</div>
 
 <!-- React -->
 <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>

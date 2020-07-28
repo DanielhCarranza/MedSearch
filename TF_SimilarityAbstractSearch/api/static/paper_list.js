@@ -2,7 +2,7 @@
 
 const Paper = props => {
   const p = props.paper
-  const url = p.id + '.full.pdf';
+  const url ='https://www.semanticscholar.org/paper/' + p.id ;
   return (
     <div class={'rel_paper ' + p.id}>
       <div class='dllinks'>
@@ -10,7 +10,7 @@ const Paper = props => {
         <div class='metadata action'><a href={url}>pdf</a></div>
         {/* <div class='metadata rel_date'>{p.rel_date}</div> */}
       </div>
-      <div class='title'><a href={p.id}>{p.title}</a></div>
+      <div class='title'><a href={url}>{p.title}</a></div>
       <div class='EmbeddingID'>{p.EmbeddingID}</div>
       <div class='paperAbstract'>{p.paperAbstract}</div>
     </div>
