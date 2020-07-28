@@ -4,8 +4,8 @@ from typing import Union, List, Tuple, Callable, Dict, Optional
 from sklearn import svm
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-from similarity_abstract_search.models.base import ModelBase
-from similarity_abstract_search.datasets.dataset import SemanticCorpusDataset
+from medsearch.models.base import ModelBase
+from medsearch.datasets.dataset import SemanticCorpusDataset
 
 
 class TfidfModel(ModelBase):

@@ -5,7 +5,7 @@ import numpy as np
 import h5py
 from pathlib import Path 
 from langid.langid import LanguageIdentifier, model
-from similarity_abstract_search import utils
+from medsearch import utils
 Path.ls = lambda x: list(x.iterdir())
 
 class TextDataCleaning:
@@ -65,7 +65,7 @@ class TextDataCleaning:
       os.remove(str(fn))
     self.paperID2EmbeddingID = {id: idx for idx, id in enumerate(paper_set)}
     if save_paper_id:
-      utils.save_dict2json(self.data_path.parent/'paperID2emb', self.paperID2EmbeddingID)
+      utils.save_to_json(self.data_path.parent/'paperID2emb', self.paperID2EmbeddingID)
     self.data_files = self.data_path.ls()
     self.cleanEmbeddings()
 

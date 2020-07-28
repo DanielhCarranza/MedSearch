@@ -5,7 +5,7 @@ import numpy as np
 import h5py
 from pathlib import Path 
 from typing import Union, List, Tuple
-from similarity_abstract_search import utils
+from medsearch import utils
 Path.ls = lambda x: list(x.iterdir())
 
 

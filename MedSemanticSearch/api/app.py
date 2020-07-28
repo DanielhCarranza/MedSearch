@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from flask import Flask, request, jsonify, url_for, render_template, redirect
-from similarity_abstract_search import utils
+from medsearch import utils
 
 app = Flask(__name__)
 DATADIR=Path(__file__).resolve().parents[2]/'Data/processed/'
