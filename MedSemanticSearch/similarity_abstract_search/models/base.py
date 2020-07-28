@@ -24,3 +24,11 @@ class ModelBase:
     def save_weights(self, obj, filename):
         with open(f'{filename}.json', 'w') as outfile:
             json.dump(obj, outfile)
+
+class TorchModelBase(ModelBase):
+    def model(self):
+        pass
+
+class TensorflowModelBase(ModelBase):
+    def model(self):
+        pass
