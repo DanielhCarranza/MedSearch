@@ -1,9 +1,13 @@
 import numpy as np
+import pandas as pd
+
 from tqdm import tqdm
 from typing import Union, List, Tuple, Callable, Dict, Optional
+
 from sklearn import svm
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+
 from medsearch.models.base import ModelBase
 from medsearch.datasets.dataset import SemanticCorpusDataset
 
@@ -26,12 +30,12 @@ class TfidfModel(ModelBase):
         X = np.asarray(V.fit_transform(corpus).astype(np.float32).todense())
         return X, V
 
-    def dotSimilarity(self, X, nTake=50):
+    def dotSimilarity(self, X:np.ndarray, nTake:int=50)->List[float]:
         S = X @ X.T
         simVec=np.argsort(S, axis=1)[:,:-nTake:-1]
         return simVec.tolist()  
 
-    def svmSimilarity(self, X, nTake=40):
+    def svmSimilarity(self, X:np.ndarray, nTake:int=40)->List[float]:
         n,_= X.shape
         IX = np.zeros((n,nTake), dtype=np.int64) 
         for i in tqdm(range(n)):
@@ -47,7 +51,7 @@ class TfidfModel(ModelBase):
         return IX.tolist()
 
 
-    def build_search_index(self,data, v):
+    def build_search_index(self,data:pd.DataFrame, v:np.ndarray):
 
         # construct a reverse index for suppoorting search
         vocab = v.vocabulary_
@@ -70,7 +74,7 @@ class TfidfModel(ModelBase):
                 idfd[w] = idfval
             return idfd
 
-        def merge_dicts(dlist):
+        def merge_dicts(dlist:List)->Dict:
             m = {}
             for d in dlist:
                 for k, v in d.items():
@@ -82,7 +86,7 @@ class TfidfModel(ModelBase):
         search_dict = [merge_dicts([t,s]) for t,s in zip(dict_title, dict_summary)]
         return search_dict
 
-def modelExampleTest(save_dicts:bool=True):
+def run_test(save_dicts:bool=True):
     model = TfidfModel(dataset_args={"batch":5000})
     df = model.data.load_one_batch()
     corpus = [f'{t} <SEP> {a}' for t,a in zip(df.title, df.paperAbstract)]
@@ -94,7 +98,7 @@ def modelExampleTest(save_dicts:bool=True):
         model.save_weights(IX, model.data.data_dirname().parent/'sim_vecs')
 
 if __name__ == "__main__":
-    modelExampleTest()
+    run_test()
     
 
 

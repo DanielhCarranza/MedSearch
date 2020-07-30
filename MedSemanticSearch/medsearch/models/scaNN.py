@@ -1,23 +1,16 @@
+"""ScaNN Accelerate Vector Similarity Search by approximating the Maximum Inner Product Search 
+        with an Anisotropic Loss function https://arxiv.org/abs/1908.10396"""
+    
 import os
 import h5py 
 import requests
 import tempfile
-import numpy as np 
-import scann
-from medsearch.models.base import ModelBase
 from typing import Union, List, Tuple, Callable, Dict, Optional
 
-_DOC="""ScaNN Accelerate Vector Similarity Search by approximating the Maximum Inner Product Search 
-        with an Anisotropic Loss function https://arxiv.org/abs/1908.10396"""
+import scann
+import numpy as np 
+from medsearch.models.base import ModelBase
 
-def get_glove_example():
-    with tempfile.TemporaryDirectory() as tmp:
-        response = requests.get("http://ann-benchmarks.com/glove-100-angular.hdf5")
-        loc = os.path.join(tmp, "glove.hdf5")
-        with open(loc, 'wb') as f:
-            f.write(response.content)
-        glove_h5py = h5py.File(loc)
-        return glove_h5py
 
 class ScaNN(ModelBase):
     def __init__(self, dataset_cls:type, 
@@ -58,4 +51,13 @@ class ScaNN(ModelBase):
             total += np.intersect1d(gt_row, row).shape[0]
         return total / true_neighbors.size
     
+
+def get_glove_example():
+    with tempfile.TemporaryDirectory() as tmp:
+        response = requests.get("http://ann-benchmarks.com/glove-100-angular.hdf5")
+        loc = os.path.join(tmp, "glove.hdf5")
+        with open(loc, 'wb') as f:
+            f.write(response.content)
+        glove_h5py = h5py.File(loc)
+        return glove_h5py
 
