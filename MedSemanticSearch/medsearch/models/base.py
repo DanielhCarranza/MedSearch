@@ -16,7 +16,8 @@ class ModelBase:
 
         if network_args is None:
             network_args={}
-        self.network = network_fn(**network_args)
+        if network_fn is not None:
+            self.network = network_fn(**network_args)
     
     def load_weights(self, filename):
         pass
@@ -46,7 +47,8 @@ class TorchModelBase(ModelBase):
 
 class TensorflowModelBase(ModelBase):
 
-    def __init__(self, dataset_cls:type, 
+    def __init__(self,
+                  dataset_cls:type, 
                   network_fn:Callable, 
                   dataset_args:Dict=None, 
                   network_args:Dict=None):
