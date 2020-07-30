@@ -26,9 +26,30 @@ class ModelBase:
             json.dump(obj, outfile)
 
 class TorchModelBase(ModelBase):
+
+    def __init__(self, 
+                  dataset_cls:type=None,
+                  tokenizer_cls:Callable=None, 
+                  network_fn:Callable=None, 
+                  dataset_args:Dict=None, 
+                  network_args:Dict=None,
+                  tokenizer_args:Dict=None):
+        super().__init__(dataset_cls, network_fn, dataset_args, network_args)
+
+        if tokenizer_args is None:
+            tokenizer_args={}
+        if tokenizer_cls is not None:
+            self.tokenizer = tokenizer_cls(**tokenizer_args)
+
     def model(self):
         pass
 
 class TensorflowModelBase(ModelBase):
+
+    def __init__(self, dataset_cls:type, 
+                  network_fn:Callable, 
+                  dataset_args:Dict=None, 
+                  network_args:Dict=None):
+        super().__init__(dataset_cls, network_fn, dataset_args, network_args)
     def model(self):
         pass
