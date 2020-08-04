@@ -35,7 +35,7 @@ class Transformer(nn.Module):
             features.update({'all_layer_embeddings':hidden_states})
         return features
     
-    def get_word_embeddings(self)->int:
+    def get_word_embeddings_dim(self)->int:
         return self.network.config.hidden_size
     
     def tokenize(self, text:str)->List[int]:
